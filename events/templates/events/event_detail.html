@@ -1,0 +1,27 @@
+{% extends "events/base.html" %}
+{% block title %}Event: {{ event.name }}{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold">{{ event.name }}</h2>
+  <div class="text-gray-600">{{ event.date }} at {{ event.time }} • {{ event.location }}</div>
+  <div class="mt-4">{{ event.description }}</div>
+  <div class="mt-4">
+    <span class="inline-block bg-gray-200 px-2 py-1 rounded text-sm">{{ event.category.name }}</span>
+  </div>
+
+  <div class="mt-6">
+    <h3 class="text-lg font-semibold">Participants ({{ event.participants.all|length }})</h3>
+    <ul class="mt-2 space-y-1">
+      {% for p in event.participants.all %}
+      <li class="text-sm">{{ p.name }} — <span class="text-gray-600">{{ p.email }}</span></li>
+      {% empty %}
+      <li class="text-sm text-gray-500">No participants yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="mt-4">
+    <a href="{% url 'events:register' event.pk %}" class="px-4 py-2 bg-green-600 text-white rounded">Register for this event</a>
+  </div>
+</div>
+{% endblock %}

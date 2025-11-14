@@ -1,0 +1,16 @@
+{% extends "events/base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Participants</h1>
+<a href="{% url 'events:participant_add' %}" class="bg-blue-600 text-white px-3 py-1 rounded">Add Participant</a>
+<ul class="mt-4 space-y-2">
+  {% for p in participants %}
+  <li class="bg-white p-4 rounded shadow flex justify-between">
+    <span>{{ p.name }} — {{ p.email }}</span>
+    <div>
+      <a href="{% url 'events:participant_edit' p.pk %}" class="text-blue-600">Edit</a> |
+      <a href="{% url 'events:participant_delete' p.pk %}" class="text-red-600">Delete</a>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

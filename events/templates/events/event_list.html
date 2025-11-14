@@ -1,0 +1,74 @@
+{% extends "events/base.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+<div class="flex flex-col md:flex-row gap-6">
+  <div class="flex-1">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-semibold">Events</h1>
+      <a href="{% url 'events:add' %}" class="px-3 py-1 bg-green-600 text-white rounded">Create Event</a>
+    </div>
+
+    <!-- Search & Filters -->
+    <form method="get" class="bg-white p-4 rounded shadow mb-4 grid grid-cols-1 md:grid-cols-4 gap-2">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search by name or location" class="border rounded p-2 md:col-span-2" />
+      <select name="category" class="border rounded p-2">
+        <option value="">All Categories</option>
+        {% for c in categories %}
+          <option value="{{ c.id }}" {% if request.GET.category == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="flex gap-2">
+        <input type="date" name="start" value="{{ request.GET.start }}" class="border rounded p-2" />
+        <input type="date" name="end" value="{{ request.GET.end }}" class="border rounded p-2" />
+      </div>
+      <div class="md:col-span-4 flex gap-2 mt-2">
+        <button class="px-3 py-2 bg-gray-800 text-white rounded">Filter</button>
+        <a href="{% url 'events:list' %}" class="px-3 py-2 border rounded">Reset</a>
+      </div>
+    </form>
+
+    <!-- Total participants -->
+    <div class="mb-4 text-sm text-gray-700">
+      Total participants across all events: <strong>{{ total_participants }}</strong>
+    </div>
+
+    <!-- Events -->
+    <div class="space-y-4">
+      {% for event in events %}
+      <div class="bg-white p-4 rounded shadow flex justify-between items-start">
+        <div>
+          <a href="{% url 'events:detail' event.pk %}" class="text-lg font-medium text-indigo-600">{{ event.name }}</a>
+          <div class="text-sm text-gray-600">{{ event.date }} at {{ event.time }} · {{ event.location }}</div>
+          <div class="text-sm mt-2">Category: <span class="inline-block bg-gray-100 px-2 py-0.5 rounded">{{ event.category.name }}</span></div>
+          <div class="text-sm mt-1 text-gray-800">Participants: <strong>{{ event.num_participants }}</strong></div>
+        </div>
+        <div class="space-y-2 text-right">
+          <a href="{% url 'events:register' event.pk %}" class="px-3 py-1 bg-green-600 text-white rounded">Register</a>
+          <div class="text-sm">
+            <a href="{% url 'events:edit' event.pk %}" class="text-indigo-600">Edit</a> |
+            <a href="{% url 'events:delete' event.pk %}" class="text-red-600">Delete</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p>No events found.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-6">
+      {% if is_paginated %}
+        <div class="flex justify-between items-center">
+          {% if page_obj.has_previous %}
+            <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}" class="px-3 py-1 border rounded">Previous</a>
+          {% endif %}
+          <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+          {% if page_obj.has_next %}
+            <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}" class="px-3 py-1 border rounded">Next</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

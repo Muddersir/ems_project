@@ -1,0 +1,27 @@
+{% extends "events/base.html" %}
+{% block title %}Register for {{ event.name }}{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold">Register for: {{ event.name }}</h2>
+  <p class="text-sm text-gray-600">{{ event.date }} at {{ event.time }}</p>
+
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="space-y-4">
+      {% for field in form %}
+      <div>
+        <label class="block text-sm font-medium">{{ field.label_tag }}</label>
+        {{ field }}
+        {% for err in field.errors %}
+          <p class="text-red-600 text-sm">{{ err }}</p>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <div>
+        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Register</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

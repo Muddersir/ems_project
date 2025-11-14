@@ -1,0 +1,119 @@
+{% extends "events/base.html" %}
+{% block title %}Organizer Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Organizer Dashboard</h1>
+
+<!-- Stats grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white p-4 rounded shadow stat-card" data-filter="all">
+    <div class="text-sm text-gray-600">Total Participants</div>
+    <div id="stat-participants" class="text-2xl font-bold">{{ total_participants }}</div>
+  </div>
+
+  <div class="bg-white p-4 rounded shadow stat-card cursor-pointer" data-filter="all">
+    <div class="text-sm text-gray-600">Total Events</div>
+    <div id="stat-events" class="text-2xl font-bold">{{ total_events }}</div>
+  </div>
+
+  <div class="bg-white p-4 rounded shadow stat-card cursor-pointer" data-filter="upcoming">
+    <div class="text-sm text-gray-600">Upcoming Events</div>
+    <div id="stat-upcoming" class="text-2xl font-bold">{{ upcoming_events }}</div>
+  </div>
+
+  <div class="bg-white p-4 rounded shadow stat-card cursor-pointer" data-filter="past">
+    <div class="text-sm text-gray-600">Past Events</div>
+    <div id="stat-past" class="text-2xl font-bold">{{ past_events }}</div>
+  </div>
+</div>
+
+<!-- Interactive controls -->
+<div class="flex gap-2 mb-4">
+  <button class="px-3 py-2 bg-indigo-600 text-white rounded" data-filter="all">All Events</button>
+  <button class="px-3 py-2 border rounded" data-filter="upcoming">Upcoming</button>
+  <button class="px-3 py-2 border rounded" data-filter="past">Past</button>
+  <button class="px-3 py-2 border rounded" data-filter="today">Today</button>
+</div>
+
+<!-- Events listing (updated by JS on clicks) -->
+<div id="dashboard-events" class="space-y-4">
+  <h2 class="text-lg font-semibold">Today's Events ({{ today }})</h2>
+  {% if todays_events %}
+    {% for e in todays_events %}
+    <div class="bg-white p-4 rounded shadow flex justify-between items-start">
+      <div>
+        <a href="{% url 'events:detail' e.pk %}" class="font-medium text-indigo-600">{{ e.name }}</a>
+        <div class="text-sm text-gray-600">{{ e.time }} · {{ e.location }}</div>
+        <div class="text-sm mt-1">Category: {{ e.category.name }}</div>
+      </div>
+      <div class="text-sm">Participants: <strong>{{ e.num_participants }}</strong></div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-sm text-gray-500">No events scheduled for today.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+  // Interactive dashboard: fetch JSON endpoints and update listings
+  const statButtons = document.querySelectorAll('[data-filter]');
+  const eventsContainer = document.getElementById('dashboard-events');
+
+  function renderEvents(events, title) {
+    let html = `<h2 class="text-lg font-semibold">${title}</h2>`;
+    if (!events.length) {
+      html += `<p class="text-sm text-gray-500">No events found.</p>`;
+    } else {
+      events.forEach(e => {
+        html += `
+          <div class="bg-white p-4 rounded shadow flex justify-between items-start">
+            <div>
+              <a href="/event/${e.id}/" class="font-medium text-indigo-600">${e.name}</a>
+              <div class="text-sm text-gray-600">${e.time} · ${e.location}</div>
+              <div class="text-sm mt-1">Category: ${e.category || ''}</div>
+            </div>
+            <div class="text-sm">Participants: <strong>${e.num_participants}</strong></div>
+          </div>
+        `;
+      });
+    }
+    eventsContainer.innerHTML = html;
+  }
+
+  async function loadFiltered(filter) {
+    // update stats numbers too
+    try {
+      const statsResp = await fetch("{% url 'events:dashboard_stats_json' %}");
+      const statsData = await statsResp.json();
+      document.getElementById('stat-participants').textContent = statsData.total_participants;
+      document.getElementById('stat-events').textContent = statsData.total_events;
+      document.getElementById('stat-upcoming').textContent = statsData.upcoming_events;
+      document.getElementById('stat-past').textContent = statsData.past_events;
+
+      // fetch events
+      const resp = await fetch("{% url 'events:dashboard_events_json' %}?filter=" + encodeURIComponent(filter));
+      const data = await resp.json();
+      let title = 'Events';
+      if (filter === 'upcoming') title = 'Upcoming Events';
+      else if (filter === 'past') title = 'Past Events';
+      else if (filter === 'today') title = "Today's Events";
+      else title = 'All Events';
+
+      renderEvents(data.events, title);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // wire buttons
+  document.querySelectorAll('.stat-card, button[data-filter]').forEach(el => {
+    el.addEventListener('click', () => {
+      const f = el.dataset.filter || el.getAttribute('data-filter');
+      loadFiltered(f);
+    });
+  });
+</script>
+{% endblock %}

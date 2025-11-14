@@ -1,0 +1,16 @@
+{% extends "events/base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Categories</h1>
+<a href="{% url 'events:category_add' %}" class="bg-blue-600 text-white px-3 py-1 rounded">Add Category</a>
+<ul class="mt-4 space-y-2">
+  {% for cat in categories %}
+  <li class="bg-white p-4 rounded shadow flex justify-between">
+    <span>{{ cat.name }}</span>
+    <div>
+      <a href="{% url 'events:category_edit' cat.pk %}" class="text-blue-600">Edit</a> |
+      <a href="{% url 'events:category_delete' cat.pk %}" class="text-red-600">Delete</a>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
