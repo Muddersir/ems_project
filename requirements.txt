@@ -1,5 +1,5 @@
 asgiref==3.8.1
-backports.zoneinfo==0.2.1
+#backports.zoneinfo==0.2.1
 Django==4.2.26
 django-debug-toolbar==4.4.6
 sqlparse==0.5.3
