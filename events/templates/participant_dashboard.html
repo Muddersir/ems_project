@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Participant Dashboard</h2>
+<h3>Events you RSVP'd to</h3>
+<ul>
+{% for e in rsvped_events %}
+  <li><a href="{% url 'event_detail' e.pk %}">{{ e.title }}</a> ({{ e.start_time }})</li>
+{% empty %}
+  <li>You have not RSVP'd to any events</li>
+{% endfor %}
+</ul>
+{% endblock %}

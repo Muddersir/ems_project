@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Events</h2>
+{% if user.is_authenticated and user.groups.all|length and user.groups.first.name in "Organizer" %}
+  <a href="{% url 'event_create' %}">Create Event</a>
+{% endif %}
+<ul>
+  {% for e in events %}
+    <li>
+      <a href="{% url 'event_detail' e.pk %}">{{ e.title }}</a>
+      ({{ e.start_time }})
+    </li>
+  {% empty %}
+    <li>No events</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+<h3>Events</h3>
+<ul>
+{% for e in events %}
+  <li>{{ e.title }} ({{ e.organizer }})</li>
+{% endfor %}
+</ul>
+<h3>Users</h3>
+<ul>
+{% for u in users %}
+  <li>{{ u.username }} - {{ u.email }} - Groups: {{ u.groups.all|join:", " }}</li>
+{% endfor %}
+</ul>
+<h3>Categories</h3>
+<ul>
+{% for c in categories %}
+  <li>{{ c.name }}</li>
+{% endfor %}
+</ul>
+{% endblock %}

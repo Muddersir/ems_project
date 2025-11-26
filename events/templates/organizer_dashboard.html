@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Organizer Dashboard</h2>
+<h3>Your Events</h3>
+<ul>
+{% for e in events %}
+  <li><a href="{% url 'event_detail' e.pk %}">{{ e.title }}</a></li>
+{% endfor %}
+</ul>
+<a href="{% url 'event_create' %}">Create new event</a>
+{% endblock %}

@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <title>Event Management</title>
+</head>
+<body>
+  <nav>
+    {% if user.is_authenticated %}
+      Hello {{ user.username }} |
+      <a href="{% url 'event_list' %}">Events</a> |
+      <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a> |
+      <a href="{% url 'signup' %}">Sign Up</a>
+    {% endif %}
+  </nav>
+  <hr/>
+  {% if messages %}
+    <ul>
+      {% for m in messages %}
+        <li>{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</body>
+</html>

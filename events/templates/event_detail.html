@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ event.title }}</h2>
+<p>{{ event.description }}</p>
+<p>Organizer: {{ event.organizer.username }}</p>
+<img src="{{ event.image.url }}" alt="event image" width="300"/>
+{% if user.is_authenticated %}
+  {% if user.groups.filter(name="Organizer").exists or user.groups.filter(name="Admin").exists %}
+    <a href="{% url 'event_edit' event.pk %}">Edit</a> |
+    <a href="{% url 'event_delete' event.pk %}">Delete</a> |
+  {% endif %}
+  {% if user_rsvped %}
+    <p>You have RSVP'd</p>
+  {% else %}
+    <form method="post" action="{% url 'rsvp_event' event.pk %}">
+      {% csrf_token %}
+      <button type="submit">RSVP</button>
+    </form>
+  {% endif %}
+{% else %}
+  <p><a href="{% url 'login' %}">Login</a> to RSVP</p>
+{% endif %}
+{% endblock %}
